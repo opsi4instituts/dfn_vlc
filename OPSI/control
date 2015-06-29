@@ -1,0 +1,39 @@
+[Package]
+version: 1
+depends:
+incremental: False
+
+[Product]
+type: localboot
+id: dfn_vlc
+name: VideoLAN - VLC media player
+description: VLC media player is a highly portable multimedia player supporting most audio and video formats (H.264, Ogg, DivX, MKV, TS, MPEG-2, mp3, MPEG-4, aac, ...) from files, physical media (DVDs, VCD, Audio-CD), TV capture cards and many network streaming protocols.It can also convert media files, transcode and act as a streaming server over unicast or multicast and IPv4 or IPv6. It doesn't need any external codec, program or codec pack to work.
+advice: 
+version: 2.2.1
+priority: 0
+licenseRequired: False
+productClasses:
+setupScript: setup.opsiscript
+uninstallScript: uninstall.opsiscript
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[ProductProperty]
+type: unicode
+name: language
+multivalue: False
+editable: False
+description: Sets the language of the user interface.
+values: ["auto", "de", "en", "fr"]
+default: ["auto"]
+
+[Changelog]
+
+vlc (2.1.5-1) stable; urgency=low
+
+  * Initial version
+
+ -- Eric Esser <esser@wzb.eu> Tue, 10 Feb 2015 15:14:08 + 0100

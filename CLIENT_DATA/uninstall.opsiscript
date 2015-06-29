@@ -1,0 +1,26 @@
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib gmbh
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/credits/
+
+[Actions]
+requiredWinstVersion >= "4.11.2.6"
+setLogLevel = 6
+DefVar $ProductId$
+DefVar $ExitCode$
+DefVar $firstInstallation$
+  
+; This should be edited
+set $ProductId$ = "vlc"
+set $firstInstallation$ = "true"
+
+killtask "vlc.exe"
+comment "Show product picture"
+ShowBitmap "%scriptpath%\" + $ProductId$ + ".png" "VLC"
+
+if FileExists("%ScriptPath%\delsub.opsiscript")
+	comment  "Start uninstall sub section"
+	sub "%ScriptPath%\delsub.opsiscript"
+endif
+
+
