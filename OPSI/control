@@ -1,6 +1,6 @@
 [Package]
 version: 1
-depends:
+depends: 
 incremental: False
 
 [Product]
@@ -12,7 +12,7 @@ advice:
 version: 2.2.1
 priority: 0
 licenseRequired: False
-productClasses:
+productClasses: 
 setupScript: setup.opsiscript
 uninstallScript: uninstall.opsiscript
 updateScript: 
@@ -30,10 +30,35 @@ description: Sets the language of the user interface.
 values: ["auto", "de", "en", "fr"]
 default: ["auto"]
 
-[Changelog]
+[ProductProperty]
+type: unicode
+name: custom-post-install
+multivalue: False
+editable: False
+description: Define filename for include script in custom directory after installation
+values: ["none", "post-install.opsiinc"]
+default: ["none"]
 
+[ProductProperty]
+type: unicode
+name: custom-post-deinstall
+multivalue: False
+editable: False
+description: Define filename for include script in custom directory after deinstallation
+values: ["none", "post-deinstall.opsiinc"]
+default: ["none"]
+
+[ProductProperty]
+type: bool
+name: desktopicon
+description: Wether an icon is set on the desktop or not
+default: True
+
+[Changelog]
 vlc (2.1.5-1) stable; urgency=low
 
   * Initial version
 
  -- Eric Esser <esser@wzb.eu> Tue, 10 Feb 2015 15:14:08 + 0100
+
+

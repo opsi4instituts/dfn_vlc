@@ -33,7 +33,8 @@ DefVar $system_language$
 DefStringList $languagemap$
 DefVar $firstInstallation$
 DefVar $Setupfile$
-
+DefVar $CustomPostInstall$
+DefVar $DesktopIcon$
 
 set $MinimumSpace$ = "200 MB"
 set $LicenseRequired$ = "false"
@@ -48,6 +49,7 @@ set $francais$ = "fr"
 
 set $installationLanguage$ = $deutsch$
 Set $language$ = GetProductProperty("language", "auto")
+Set $DesktopIcon$ = GetProductProperty("desktopicon", "true")
 
 set $ProductId$ = "vlc"
 set $bit_version$ = "32"
@@ -94,7 +96,12 @@ else
 	comment "Start setup program"
 	Winbatch_install
 	sub_check_exitcode
-	
+
+  if $DesktopIcon$ = "true"
+    ;Remove Desktopicon bei allen Usern?
+    ;C:\Users\Public\Desktop\VLC media player.lnk
+  endif  
+
 	if $firstInstallation$ = "true"
 		if ($language$ = "auto")
 			set $languagemap$ = GetLocaleInfoMap
@@ -128,6 +135,13 @@ else
 		Registry_set_language /AllNTUserDats
 	endif
 	
+  comment "include custom post install file"
+  set $CustomPostInstall$ = getProductProperty("custom-post-install","none")
+  if not ($CustomPostInstall$ = "none")
+	  if FileExists("%ScriptPath%\custom\" + $CustomPostInstall$)
+		  include_insert "%ScriptPath%\custom\" + $CustomPostInstall$
+	  endif
+  endif
 endif
 
 [Winbatch_install]

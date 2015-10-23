@@ -2,6 +2,7 @@
 ; This sourcecode is owned by uib gmbh
 ; and published under the Terms of the General Public License.
 ; credits: http://www.opsi.org/credits/
+DefVar $CustomPostDeinstall$
 
 [Actions]
 requiredWinstVersion >= "4.11.2.6"
@@ -23,4 +24,10 @@ if FileExists("%ScriptPath%\delsub.opsiscript")
 	sub "%ScriptPath%\delsub.opsiscript"
 endif
 
-
+comment "include custom post deinstall file"
+set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
+if not ($CustomPostDeinstall$ = "none")
+	if FileExists("%ScriptPath%\custom\" + $CustomPostDeinstall$)
+		include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
+	endif
+endif
