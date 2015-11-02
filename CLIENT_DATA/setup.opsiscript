@@ -97,9 +97,8 @@ else
 	Winbatch_install
 	sub_check_exitcode
 
-  if $DesktopIcon$ = "true"
-    ;Remove Desktopicon bei allen Usern?
-    ;C:\Users\Public\Desktop\VLC media player.lnk
+  if $DesktopIcon$ = "false"
+    Files_delete_desktop_icon
   endif  
 
 	if $firstInstallation$ = "true"
@@ -179,6 +178,9 @@ endif
 [Registry_set_language]
 openkey [HKEY_CURRENT_USER\Software\VideoLAN\VLC]
 set "Lang" = REG_SZ:"$installationLanguage$" 
+
+[Files_delete_desktop_icon]
+del -f -c "%CommonDesktopDir%\VLC media player.lnk"
 
 [LinkFolder_install]
 ; Example of deleting a folder from AllUsers startmenu:

@@ -1,6 +1,6 @@
 [Package]
 version: 1
-depends: 
+depends:
 incremental: False
 
 [Product]
@@ -12,7 +12,7 @@ advice:
 version: 2.2.1
 priority: 0
 licenseRequired: False
-productClasses: 
+productClasses:
 setupScript: setup.opsiscript
 uninstallScript: uninstall.opsiscript
 updateScript: 
@@ -55,10 +55,9 @@ description: Wether an icon is set on the desktop or not
 default: True
 
 [Changelog]
+
 vlc (2.1.5-1) stable; urgency=low
 
   * Initial version
 
  -- Eric Esser <esser@wzb.eu> Tue, 10 Feb 2015 15:14:08 + 0100
-
-
