@@ -1,0 +1,20 @@
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib gmbh
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+
+[Actions]
+Message "Profile Patch for VLC...."
+
+comment "Did we run this script before ? - and set version stamp in profile"
+if getValue("installationstate", getProductMap) = "installed"
+	comment "Product is installed"
+   	if not (FileExists("%CurrentAppdataDir%\vlc\vlcrc"))
+        	Files_copy_config
+        endif
+endif
+
+[Files_copy_config]
+copy "%ScriptPath%\vlcrc" "%CurrentAppdataDir%\vlc\"
+
+

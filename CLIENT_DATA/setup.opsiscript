@@ -2,285 +2,85 @@
 ; This sourcecode is owned by uib
 ; and published under the Terms of the General Public License.
 ; credits: http://www.opsi.org/credits/
-[initial]
-setLogLevel=6
-;  Log Errors in Logfile but don't abort:
-ExitOnError=false
-; Show syntax errors in the script:
-ScriptErrorMessages=on
-; Dont trace step by step through the script:
-TraceMode=off
-; let started programs run in front of the winst window
-StayOnTop=false
 
-[actions]
-requiredWinstVersion >= "4.11.2.6"
-
-DefVar $ProductId$
-DefVar $MinimumSpace$
-DefVar $InstallDir$
-DefVar $ExitCode$
-DefVar $LicenseRequired$
-
-DefVar $version$
-DefVar $bit_version$
-DefVar $installationLanguage$
-DefVar $deutsch$
-DefVar $francais$
-DefVar $english$
-DefVar $language$
-DefVar $system_language$
-DefStringList $languagemap$
-DefVar $firstInstallation$
-DefVar $Setupfile$
-DefVar $CustomPostInstall$
-DefVar $DesktopIcon$
-
-set $MinimumSpace$ = "200 MB"
-set $LicenseRequired$ = "false"
-Set $InstallDir$ = "%ProgramFiles32Dir%\VideoLAN\VLC"
-set $firstInstallation$ = "true"
-set $deutsch$ = "de"
-set $english$ = "en"
-set $francais$ = "fr"
-;set $deutsch$ = "1031"
-;set $english$ = "1033"
-;set $francais$ = "1036"
-
-set $installationLanguage$ = $deutsch$
-Set $language$ = GetProductProperty("language", "auto")
-Set $DesktopIcon$ = GetProductProperty("desktopicon", "true")
-
-set $ProductId$ = "vlc"
-set $bit_version$ = "32"
-Set $Version$					= "2.2.1"
-if FileExists("%ScriptDrive%\lib\getproductmap.opsiinc")
-;  read product values from configserver, such as ProductVersion
-   setLogLevel = 7
-   include_insert "%ScriptDrive%\lib\getproductmap.opsiinc"
-   setLogLevel = 6
-   Set $Version$	= $ProductMap_ProductVersion$
-   comment "use GetProductMap-Version: "+ $Setupfile$
-endif
-Set $Setupfile$ = $ProductId$ + "-" + $Version$ + "-win" + $bit_version$ + ".exe"
+[Actions]
+; common Values for (un)installation
+include_insert "common.opsiinc"
 
 if not(HasMinimumSpace ("%SYSTEMDRIVE%", $MinimumSpace$))
 	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
 	isFatalError "No Space"
-	; Stop process and set installation status to failed
 else
-  killtask "vlc.exe"
+	killtask "vlc.exe"
+
 	comment "show product picture"
-	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" "VLC" + " " + $Version$ 
+	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductName$ 
 	
 	if FileExists("%ScriptPath%\delsub.opsiscript")
 		comment  "start uninstall sub section"
 		sub "%ScriptPath%\delsub.opsiscript"
 	endif
 
-	Message "Installing " + $ProductId$ + " ..."
+	Message "Installing %installingProdName% (%installingProdVersion%) " + $INST_architecture$ + "Bit..."
 	
-	if $LicenseRequired$ = "true"
-		comment "Licensing required, reserve license and get license key"
-		Sub_get_licensekey
-	endif
-
-
 	comment "Start setup program"
-	ChangeDirectory "%SCRIPTPATH%"
 	Winbatch_install
 	Sub_check_exitcode
 	
-	Message "Installing VLC ..."
-	
-	comment "Start setup program"
-	Winbatch_install
-	sub_check_exitcode
-
-  if $DesktopIcon$ = "false"
-    Files_delete_desktop_icon
-  endif  
-
-	if $firstInstallation$ = "true"
-		if ($language$ = "auto")
-			set $languagemap$ = GetLocaleInfoMap
-			set  $system_language$ = lower(getValue("system_default_language_id", $languagemap$))
-			if $system_language$ = "0407"
-				set $installationLanguage$ = $deutsch$
-			endif
-			if $system_language$ = "0409"
-				set $installationLanguage$ = $english$
-			endif
-			if $system_language$ = "040c"
-				set $installationLanguage$ = $francais$
-			endif
-			if (not($system_language$ = "0407") and not($system_language$ = "0409") and not($system_language$ = "040c"))		
-				set $installationLanguage$ = $english$
-			endif
-		endif
-	
-		if ($language$ = "de")
-			set $installationLanguage$ = $deutsch$
-		endif	
-		
-		if ($language$ = "en")
-			set $installationLanguage$ = $english$
-		endif	
-	
-		if ($language$ = "fr")
-			set $installationLanguage$ = $francais$
-		endif	
-	
-		Registry_set_language /AllNTUserDats
+	Set $SearchPattern$ = $ProductName$
+	; Parameter: $SearchPattern$ Suchbegriff in Registry
+	if ($INST_architecture$ = "64")
+		Sub_search_registry64_uninstall_keys
+	else
+		Sub_search_registry32_uninstall_keys
 	endif
-	
-  comment "include custom post install file"
-  set $CustomPostInstall$ = getProductProperty("custom-post-install","none")
-  if not ($CustomPostInstall$ = "none")
-	  if FileExists("%ScriptPath%\custom\" + $CustomPostInstall$)
-		  include_insert "%ScriptPath%\custom\" + $CustomPostInstall$
-	  endif
-  endif
+	; Rückgabewert: $ResultList$ gefundene Einträge
+
+	Switch count ($ResultList$)
+		Case "0"
+			logError "Fatal: After Installation " + $ProductName$ + " could not be found in " + $RegPathUninstall$
+			isFatalError
+		EndCase
+		Case "1"
+			comment "Successful Installation"
+			comment "Get 'DisplayIcon' from registry for path to exe"
+			Set $RegId$ = takeSTring(0, $ResultList$)
+			if ($INST_architecture$ = "64")
+				Set $InstallDirExe$ = GetRegistryStringValue64("[" + $RegPathUninstall$ + "\" + $RegId$ + "] DisplayIcon")
+			else
+				Set $InstallDirExe$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] DisplayIcon")
+			endif
+
+			Set $DesktopIcon$ = GetProductProperty("desktopicon", "true")
+			if $DesktopIcon$ = "false"
+				Linkfolder_delete_desktopicon
+			endif  
+
+			comment "include custom post install file"
+			set $CustomPostInstall$ = getProductProperty("custom-post-install","none")
+			if not ($CustomPostInstall$ = "none")
+				if FileExists("%ScriptPath%\custom\" + $CustomPostInstall$)
+					include_insert "%ScriptPath%\custom\" + $CustomPostInstall$
+				endif
+			endif
+			
+			if $firstInstallation$ = "true"
+				Registry_set_language /AllNTUserDats
+			endif
+		EndCase
+	EndSwitch
 endif
 
 [Winbatch_install]
-; Choose one of the following examples as basis for your installation
-; You can use $LicenseKey$ var to pass a license key to the installer
-;
 ; === Nullsoft Scriptable Install System ================================================================
-"%ScriptPath%\$Setupfile$" /L=$installationLanguage$ /S
-;
-; === MSI package =======================================================================================
-; You may use the parameter PIDKEY=$Licensekey$
-; msiexec /i "%ScriptPath%\some.msi" /l* "$LogDir$\$ProductId$.install_log.txt" /qb! ALLUSERS=1 REBOOT=ReallySuppress
-;
-; === InstallShield + MSI=====================================================================================
-; Attention: The path to the log file should not contain any whitespaces
-; "%ScriptPath%\setup.exe" /s /v" /l* $LogDir$\$ProductId$.install_log.txt /qb! ALLUSERS=1 REBOOT=ReallySuppress"
-; "%ScriptPath%\setup.exe" /s /v" /qb! ALLUSERS=2 REBOOT=ReallySuppress"
-;
-; === InstallShield =====================================================================================
-; Create setup.iss answer file by running: setup.exe /r /f1"c:\setup.iss"
-; You may use an answer file by the parameter /f1"c:\setup.iss"
-; "%ScriptPath%\setup.exe" /s /sms /f2"$LogDir$\$ProductId$.install_log.txt"
-;
-; === Inno Setup ========================================================================================
-; http://unattended.sourceforge.net/InnoSetup_Switches_ExitCodes.html
-; You may create setup answer file by: setup.exe /SAVEINF="filename"
-; You may use an answer file by the parameter /LOADINF="filename"
-; "%ScriptPath%\setup.exe" /sp- /silent /norestart /nocancel /SUPPRESSMSGBOXES
-
-[Files_install]
-; Example of recursively copying some files into the installation directory:
-;
-; copy -s "%ScriptPath%\files\*.*" "$InstallDir$"
+"%ScriptPath%\$InstFile$" /L=$language$ /S
 
 [Registry_set_language]
 openkey [HKEY_CURRENT_USER\Software\VideoLAN\VLC]
-set "Lang" = REG_SZ:"$installationLanguage$" 
+set "Lang" = REG_SZ:"$language$" 
 
-[Files_delete_desktop_icon]
-del -f -c "%CommonDesktopDir%\VLC media player.lnk"
-
-[LinkFolder_install]
-; Example of deleting a folder from AllUsers startmenu:
-;
-; set_basefolder common_programs
-; delete_subfolder $ProductId$
-;
-; Example of creating an shortcut to the installed exe in AllUsers startmenu:
-;
-; set_basefolder common_programs
-; set_subfolder $ProductId$
-;
-; set_link
-; 	name: $ProductId$
-; 	target: <path to the program>
-; 	parameters:
-; 	working_dir: $InstallDir$
-; 	icon_file:
-; 	icon_index:
-; end_link
-;
-; Example of creating an shortcut to the installed exe on AllUsers desktop:
-;
-; set_basefolder common_desktopdirectory
-; set_subfolder ""
-;
-; set_link
-; 	name: $ProductId$
-; 	target: <path to the program>
-; 	parameters: <some_param>
-; 	working_dir: $InstallDir$
-; 	icon_file: <path to icon file>
-; 	icon_index: 2
-; end_link
-
-[Sub_get_licensekey]
-if opsiLicenseManagementEnabled
-	comment "License management is enabled and will be used"
-
-	comment "Trying to get a license key"
-	Set $LicenseKey$ = demandLicenseKey ($LicensePool$)
-	; If there is an assignment of exactly one licensepool to the product the following call is possible:
-	; Set $LicenseKey$ = demandLicenseKey ("", $ProductId$)
-	;
-	; If there is an assignment of a license pool to a windows software id, it is possible to use:
-	; DefVar $WindowsSoftwareId$
-	; $WindowsSoftwareId$ = "..."
-	; Set $LicenseKey$ = demandLicenseKey ("", "", $WindowsSoftwareId$)
-	
-	DefVar $ServiceErrorClass$
-	set $ServiceErrorClass$ = getLastServiceErrorClass
-	comment "Error class: " + $ServiceErrorClass$
-	
-	if $ServiceErrorClass$ = "None"
-		comment "Everything fine, we got the license key '" + $LicenseKey$ + "'"
-	else
-		if $ServiceErrorClass$ = "LicenseConfigurationError"
-			LogError "Fatal: license configuration must be corrected"
-			LogError getLastServiceErrorMessage
-			isFatalError
-		else 
-			if $ServiceErrorClass$ = "LicenseMissingError"
-				LogError "Fatal: required license is not supplied"
-				isFatalError
-			endif
-		endif
-	endif
-else
-	LogError "Fatal: license required, but license management not enabled"
-	isFatalError
-endif
-
-
-[Sub_check_exitcode]
-comment "Test for installation success via exit code"
-set $ExitCode$ = getLastExitCode
-; informations to exit codes see
-; http://msdn.microsoft.com/en-us/library/aa372835(VS.85).aspx
-; http://msdn.microsoft.com/en-us/library/aa368542.aspx
-if ($ExitCode$ = "0")
-	comment "Looks good: setup program gives exitcode zero"
-else
-	comment "Setup program gives a exitcode unequal zero: " + $ExitCode$
-	if ($ExitCode$ = "1605")
-		comment "ERROR_UNKNOWN_PRODUCT	1605	This action is only valid for products that are currently installed."
-		comment "Uninstall of a not installed product failed - no problem"
-	else
-		if ($ExitCode$ = "1641")
-			comment "looks good: setup program gives exitcode 1641"
-			comment "ERROR_SUCCESS_REBOOT_INITIATED	1641	The installer has initiated a restart. This message is indicative of a success."
-		else
-			if ($ExitCode$ = "3010")
-				comment "looks good: setup program gives exitcode 3010"
-				comment "ERROR_SUCCESS_REBOOT_REQUIRED	3010	A restart is required to complete the install. This message is indicative of a success."
-			else
-				logError "Fatal: Setup program gives an unknown exitcode unequal zero: " + $ExitCode$
-				isFatalError
-			endif
-		endif
-	endif
-endif
-
+[Linkfolder_delete_desktopicon]
+	set_basefolder common_desktopdirectory
+	set_subfolder ""
+	delete_element $ProductName$
 
