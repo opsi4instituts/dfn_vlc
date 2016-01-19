@@ -1,25 +1,25 @@
 [Package]
-version: 1
-depends:
+version: 3
+depends: 
 incremental: False
 
 [Product]
 type: localboot
 id: dfn_vlc
-name: VideoLAN - VLC media player
-description: VLC media player is a highly portable multimedia player supporting most audio and video formats (H.264, Ogg, DivX, MKV, TS, MPEG-2, mp3, MPEG-4, aac, ...) from files, physical media (DVDs, VCD, Audio-CD), TV capture cards and many network streaming protocols.It can also convert media files, transcode and act as a streaming server over unicast or multicast and IPv4 or IPv6. It doesn't need any external codec, program or codec pack to work.
+name: VLC media player
+description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming
 advice: 
 version: 2.2.1
 priority: 0
 licenseRequired: False
-productClasses:
+productClasses: 
 setupScript: setup.opsiscript
 uninstallScript: uninstall.opsiscript
 updateScript: 
 alwaysScript: 
 onceScript: 
 customScript: 
-userLoginScript: 
+userLoginScript: login.opsiscript
 
 [ProductProperty]
 type: unicode
@@ -29,6 +29,15 @@ editable: False
 description: Sets the language of the user interface.
 values: ["auto", "de", "en", "fr"]
 default: ["auto"]
+
+[ProductProperty]
+type: unicode
+name: install_architecture
+multivalue: False
+editable: False
+description: Defines wether to install the version of 64bit, 32bit or automatic detection.
+values: ["32 only", "64 only", "system specific"]
+default: ["system specific"]
 
 [ProductProperty]
 type: unicode
@@ -52,12 +61,39 @@ default: ["none"]
 type: bool
 name: desktopicon
 description: Wether an icon is set on the desktop or not
-default: True
+default: False
 
 [Changelog]
+dfn_vlc (2.2.1-3)
+	* login.opsiscript added (https://github.com/opsi4instituts/dfn_vlc/issues/4)
+	* install_architecture added (32 or 64 bit installable)
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 12.01.2016
+
+dfn_vlc (2.2.1-2)
+	* custom directory added
+	* Desktopicon configurable
+ -- Eric Esser <esser@wzb.eu>, 01.11.2015
 
 vlc (2.1.5-1) stable; urgency=low
 
   * Initial version
 
  -- Eric Esser <esser@wzb.eu> Tue, 10 Feb 2015 15:14:08 + 0100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

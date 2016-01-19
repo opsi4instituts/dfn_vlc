@@ -2,32 +2,18 @@
 ; This sourcecode is owned by uib gmbh
 ; and published under the Terms of the General Public License.
 ; credits: http://www.opsi.org/credits/
-DefVar $CustomPostDeinstall$
 
 [Actions]
-requiredWinstVersion >= "4.11.2.6"
-setLogLevel = 6
-DefVar $ProductId$
-DefVar $ExitCode$
-DefVar $firstInstallation$
-  
-; This should be edited
-set $ProductId$ = "vlc"
-set $firstInstallation$ = "true"
+; common Values for (un)installation
+include_insert "common.opsiinc"
 
 killtask "vlc.exe"
+
 comment "Show product picture"
-ShowBitmap "%scriptpath%\" + $ProductId$ + ".png" "VLC"
+ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductName$
 
 if FileExists("%ScriptPath%\delsub.opsiscript")
 	comment  "Start uninstall sub section"
 	sub "%ScriptPath%\delsub.opsiscript"
 endif
 
-comment "include custom post deinstall file"
-set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
-if not ($CustomPostDeinstall$ = "none")
-	if FileExists("%ScriptPath%\custom\" + $CustomPostDeinstall$)
-		include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
-	endif
-endif

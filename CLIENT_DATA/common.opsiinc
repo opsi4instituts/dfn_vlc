@@ -1,0 +1,95 @@
+requiredWinstVersion >= "4.11.4.3"
+
+DefVar $UninstallProgram$
+DefVar $LogDir$
+DefVar $ProductId$
+DefVar $ProductName$
+DefVar $MinimumSpace$
+DefVar $InstallDir$
+DefVar $InstallDirExe$
+DefVar $InstFile$
+DefVar $ExitCode$
+DefVar $MSVersion$
+DefVar $RegPathUninstall$
+DefVar $RegId$
+DefVar $INST_architecture$
+DefVar $INST_SystemType$
+DefVar $CustomPostInstall$
+DefVar $CustomPostDeinstall$
+DefVar $DesktopIcon$
+DefVar $SearchPattern$
+DefStringList $ResultList$
+DefVar $language$
+DefVar $system_language$
+DefStringList $languagemap$
+DefVar $firstInstallation$
+
+Set $INST_SystemType$   = GetSystemType
+Set $INST_architecture$ = GetProductProperty("install_architecture","system specific")
+
+Switch $INST_architecture$
+	Case "32 only"
+		Set $INST_architecture$ = "32"	
+	EndCase 
+	Case "64 only"
+		Set $INST_architecture$ = "64"
+	EndCase
+	Case "system specific"
+		if ($INST_SystemType$ = "x86 System")
+			Set $INST_architecture$ = "32"
+		else
+			Set $INST_architecture$ = "64"
+		endif
+	EndCase
+EndSwitch
+
+Set $MSVersion$ = GetMsVersionInfo
+Set $LogDir$ = "%opsiLogDir%"
+
+; ---------------------------------------------------------------
+; - Please edit the following values                             -
+; ----------------------------------------------------------------
+Set $ProductId$	= "vlc"
+Set $ProductName$       = "VLC media player"
+Set $MinimumSpace$	= "200 MB"
+Set $InstFile$	= "vlc-2.2.1-win" + $INST_architecture$ + ".exe"
+Set $RegPathUninstall$	= "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+; MSI setzt leider keine InstallLocation bzw. DisplayIcon, daher manuell definieren und in die Registry schreiben
+;Set $InstallDir$ = "%ProgramFiles64Dir%\" + $ProductName$
+;Set $PathToExe$ = $InstallDir$ +"\"+ $ProductName$ + ".exe"
+;Set $InstallDir$ = "%ProgramFiles32Dir%\VideoLAN\VLC"
+;Set $InstallDirExe$ = $InstallDir$ + "\vlc.exe"
+
+; ----------------------------------------------------------------
+
+include_append "section_sub_check_exitcode.opsiinc"
+include_append "section_sub_search_registry32_uninstall_keys.opsiinc"
+include_append "section_sub_search_registry64_uninstall_keys.opsiinc"
+
+if not ($MSVersion$ = "6.1" OR $MSVersion$ = "10.0")
+	Logwarning "Only tested with windows 7 and 10! Please report to the maintainer successful installation on other windows versions."		
+endif
+if not ($INST_SystemType$ = "64 Bit System")
+	Logwarning "Only tested with 64 bit version! Please report to the maintainer successful installation on other windows versions."
+endif
+
+Set $language$ = GetProductProperty("language", "auto")
+if ($language$ = "auto")
+	set $languagemap$ = GetLocaleInfoMap
+	set  $system_language$ = lower(getValue("system_default_language_id", $languagemap$))
+	Switch $system_language$
+		Case "0407"
+			set $language$ = "de"
+		EndCase
+		Case "0409"
+			set $language$ = "en"
+		EndCase
+		Case  "040c"
+			set $language$ = "fr"
+		EndCase
+		DefaultCase		
+			set $language$ = "en"
+		EndCase
+	EndSwitch
+endif
+
