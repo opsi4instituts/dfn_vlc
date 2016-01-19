@@ -1,18 +1,18 @@
 [Package]
 version: 3
-depends: 
+depends:
 incremental: False
 
 [Product]
 type: localboot
 id: dfn_vlc
 name: VLC media player
-description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming
+description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming.VLC media player is a portable, free and open-source, cross-platform media player.
 advice: 
 version: 2.2.1
 priority: 0
 licenseRequired: False
-productClasses: 
+productClasses:
 setupScript: setup.opsiscript
 uninstallScript: uninstall.opsiscript
 updateScript: 
@@ -64,36 +64,9 @@ description: Wether an icon is set on the desktop or not
 default: False
 
 [Changelog]
-dfn_vlc (2.2.1-3)
-	* login.opsiscript added (https://github.com/opsi4instituts/dfn_vlc/issues/4)
-	* install_architecture added (32 or 64 bit installable)
- -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 12.01.2016
-
-dfn_vlc (2.2.1-2)
-	* custom directory added
-	* Desktopicon configurable
- -- Eric Esser <esser@wzb.eu>, 01.11.2015
 
 vlc (2.1.5-1) stable; urgency=low
 
   * Initial version
 
  -- Eric Esser <esser@wzb.eu> Tue, 10 Feb 2015 15:14:08 + 0100
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
