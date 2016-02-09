@@ -52,7 +52,11 @@ Set $LogDir$ = "%opsiLogDir%"
 Set $ProductId$	= "vlc"
 Set $ProductName$       = "VLC media player"
 Set $MinimumSpace$	= "200 MB"
-Set $InstFile$	= "vlc-2.2.1-win" + $INST_architecture$ + ".exe"
+
+DefVar	$ProductVersion$
+Set $ProductVersion$	= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $InstFile$	= "vlc-" + $ProductVersion$ + "-win" + $INST_architecture$ + ".exe"
+
 Set $RegPathUninstall$	= "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 ; MSI setzt leider keine InstallLocation bzw. DisplayIcon, daher manuell definieren und in die Registry schreiben
 ;Set $InstallDir$ = "%ProgramFiles64Dir%\" + $ProductName$
