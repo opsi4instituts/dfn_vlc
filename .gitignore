@@ -11,6 +11,8 @@ bin/
 tmp/
 *.tmp
 *.opsi
+*.zsync
+*.md5
 *.exe
 *.bak
 *.swp
