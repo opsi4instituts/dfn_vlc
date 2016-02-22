@@ -36,12 +36,6 @@ if not ( $UninstallProgram$ = "" )
     	Winbatch_uninstall
     	sub_check_exitcode
     
-	set $DesktopIcon$ = getProductProperty("desktopicon","no")
-	if $DesktopIcon$ = "yes"
-		comment "Delete common desktop icon"
-		Linkfolder_uninstall_desktopicon	
-	endif
-
 	comment "include custom post deinstall file"
 	set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
 	if not ($CustomPostDeinstall$ = "none")
