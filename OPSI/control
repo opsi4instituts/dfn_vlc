@@ -9,7 +9,7 @@ id: dfn_vlc
 name: VLC media player
 description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming
 advice: 
-version: 2.2.3
+version: 2.2.5.1
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -64,11 +64,21 @@ description: Wether an icon is set on the desktop or not
 default: False
 
 [Changelog]
-dfn_vlc (2.2.3-1)
+dfn_vlc (2.2.5.1-1)
 	* neue Upstreamversion
- -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 03.05.2016
+	* o4i-Logo repariert
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 15.05.2017
 
-dfn_vlc (2.2.2-1)
+dfn_vlc (2.2.4-006)
+	* minor Update
+ -- Detlef Krummel (GEI) <krummel@gei.de>, 05.06.2016
+
+dfn_vlc (2.2.3-005)
+	* minor Update
+	* o4i Icon
+ -- Detlef Krummel (GEI) <krummel@gei.de>, 09.02.2016
+
+dfn_vlc (2.2.2-004)
 	* minor Update
 	* Set $InstFile$  = "vlc-" + $ProductVersion$ + "-win" + ...
  -- Detlef Krummel (GEI) <krummel@gei.de>, 09.02.2016
@@ -88,7 +98,6 @@ vlc (2.1.5-1) stable; urgency=low
   * Initial version
 
  -- Eric Esser <esser@wzb.eu> Tue, 10 Feb 2015 15:14:08 + 0100
-
 
 
 
