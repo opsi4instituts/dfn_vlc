@@ -9,10 +9,12 @@ custom
 .metadata
 bin/
 tmp/
+orig/
 *.tmp
 *.opsi
 *.zsync
 *.md5
+*.sha256
 *.exe
 *.bak
 *.swp
