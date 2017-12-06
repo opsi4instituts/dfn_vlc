@@ -50,7 +50,7 @@ Set $LogDir$ = "%opsiLogDir%"
 ; - Please edit the following values                             -
 ; ----------------------------------------------------------------
 Set $ProductId$	= "vlc"
-Set $ProductName$       = "VLC media player"
+Set $ProductName$ = "VLC media player"
 Set $MinimumSpace$	= "200 MB"
 
 DefVar	$ProductVersion$

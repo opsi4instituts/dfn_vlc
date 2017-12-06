@@ -13,8 +13,14 @@ if not(HasMinimumSpace ("%SYSTEMDRIVE%", $MinimumSpace$))
 else
 	killtask "vlc.exe"
 
-	comment "show product picture"
-	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductName$ 
+  comment "Show product picture"
+	if (FileExists("%ScriptPath%\..\lib\icons\%installingProdName%.png"))
+    comment "logo at local library/icons found."
+    ShowBitmap "%ScriptPath%\..\lib\icons\%installingProdName%.png" $ProductName$ + " " + $ProductVersion$
+  else
+    comment "no logo at local library/icons, use from ScriptPath ..."
+    ShowBitmap "%ScriptPath%\o4i.png" $ProductName$ + " " + $ProductVersion$
+  endif
 	
 	if FileExists("%ScriptPath%\delsub.opsiscript")
 		comment  "start uninstall sub section"
