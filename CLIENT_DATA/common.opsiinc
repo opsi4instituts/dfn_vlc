@@ -77,6 +77,15 @@ if not ($INST_SystemType$ = "64 Bit System")
 	Logwarning "Only tested with 64 bit version! Please report to the maintainer successful installation on other windows versions."
 endif
 
+comment "Show product picture"
+if (FileExists("%ScriptPath%\..\lib\icons\%installingProdName%.png"))
+	comment "logo at local library/icons found."
+    ShowBitmap "%ScriptPath%\..\lib\icons\%installingProdName%.png" $ProductName$ + " " + $ProductVersion$
+	else
+  	  comment "no logo at local library/icons, use from ScriptPath ..."
+    ShowBitmap "%ScriptPath%\o4i.png" $ProductName$ + " " + $ProductVersion$
+endif
+
 Set $language$ = GetProductProperty("language", "auto")
 if ($language$ = "auto")
 	set $languagemap$ = GetLocaleInfoMap
