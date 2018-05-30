@@ -1,7 +1,6 @@
 [Package]
 version: 1
 depends: 
-incremental: False
 
 [Product]
 type: localboot
@@ -9,7 +8,7 @@ id: dfn_vlc
 name: VLC media player
 description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming
 advice: 
-version: 3.0.2
+version: 3.0.3
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -59,11 +58,18 @@ default: ["none"]
 
 [ProductProperty]
 type: bool
-name: desktopicon
-description: Whether an icon is set on the desktop or not
+name: desktop-link
+description: Link on Desktop?
 default: False
 
 [Changelog]
+dfn_vlc (3.0.3-1) stable; urgency=low
+  * neue Upstreamversion
+  * neue Regsuche (local function, universel 32/64, benötigt opsi-winst 4.12.0.16)
+  * Verwendung uib_exitcode (local function)
+  * diverse kleinere Anpassungen (o4i-Richtlinie)
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 30.05.2018
+
 dfn_vlc (3.0.2-1) stable; urgency=low
   * neue Upstreamversion
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 26.04.2018

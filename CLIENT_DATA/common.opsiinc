@@ -1,4 +1,4 @@
-requiredWinstVersion >= "4.11.4.3"
+requiredWinstVersion >= "4.12.0.16"
 
 DefVar $UninstallProgram$
 DefVar $LogDir$
@@ -6,23 +6,25 @@ DefVar $ProductId$
 DefVar $ProductName$
 DefVar $MinimumSpace$
 DefVar $InstallDir$
-DefVar $InstallDirExe$
+DefVar $PathToExe$
 DefVar $InstFile$
 DefVar $ExitCode$
+DefVar $ErrorString$
 DefVar $MSVersion$
-DefVar $RegPathUninstall$
 DefVar $RegId$
+DefVar $RegBitScope$
 DefVar $INST_architecture$
 DefVar $INST_SystemType$
 DefVar $CustomPostInstall$
 DefVar $CustomPostDeinstall$
-DefVar $DesktopIcon$
-DefVar $SearchPattern$
+DefVar $DesktopLink$
 DefStringList $ResultList$
 DefVar $language$
 DefVar $system_language$
 DefStringList $languagemap$
 DefVar $firstInstallation$
+DefVar $ProductVersion$
+DefVar $InstalledVersion$
 
 Set $INST_SystemType$   = GetSystemType
 Set $INST_architecture$ = GetProductProperty("install_architecture","system specific")
@@ -43,32 +45,25 @@ Switch $INST_architecture$
 	EndCase
 EndSwitch
 
+Set $ProductVersion$	= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
 Set $MSVersion$ = GetMsVersionInfo
 Set $LogDir$ = "%opsiLogDir%"
+
+Set $DesktopLink$ = GetProductProperty("desktop-link", "false")
 
 ; ---------------------------------------------------------------
 ; - Please edit the following values                             -
 ; ----------------------------------------------------------------
 Set $ProductId$	= "vlc"
 Set $ProductName$ = "VLC media player"
-Set $MinimumSpace$	= "200 MB"
-
-DefVar	$ProductVersion$
-Set $ProductVersion$	= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $MinimumSpace$	= "152 MB"
 Set $InstFile$	= "vlc-" + $ProductVersion$ + "-win" + $INST_architecture$ + ".exe"
-
-Set $RegPathUninstall$	= "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-; MSI setzt leider keine InstallLocation bzw. DisplayIcon, daher manuell definieren und in die Registry schreiben
-;Set $InstallDir$ = "%ProgramFiles64Dir%\" + $ProductName$
-;Set $PathToExe$ = $InstallDir$ +"\"+ $ProductName$ + ".exe"
-;Set $InstallDir$ = "%ProgramFiles32Dir%\VideoLAN\VLC"
-;Set $InstallDirExe$ = $InstallDir$ + "\vlc.exe"
-
 ; ----------------------------------------------------------------
 
-include_append "section_sub_check_exitcode.opsiinc"
-include_append "section_sub_search_registry32_uninstall_keys.opsiinc"
-include_append "section_sub_search_registry64_uninstall_keys.opsiinc"
+; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
+importLib "uib_exitcode.opsiscript"
+; Library registry search uninstall keys (local functions)
+importLib "func_search_registry_uninstall_keys.opsiinc"
 
 if not ($MSVersion$ = "6.1" OR $MSVersion$ = "10.0")
 	Logwarning "Only tested with windows 7 and 10! Please report to the maintainer successful installation on other windows versions."		

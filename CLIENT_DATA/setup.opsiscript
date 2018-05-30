@@ -6,8 +6,6 @@ if not(HasMinimumSpace ("%SYSTEMDRIVE%", $MinimumSpace$))
 	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
 	isFatalError "No Space"
 else
-	killtask "vlc.exe"
-
 	if FileExists("%ScriptPath%\delsub.opsiscript")
 		comment  "start uninstall sub section"
 		sub "%ScriptPath%\delsub.opsiscript"
@@ -17,16 +15,15 @@ else
 	
 	comment "Start setup program"
 	Winbatch_install
-	Sub_check_exitcode
-	
-	Set $SearchPattern$ = $ProductName$
-	; Parameter: $SearchPattern$ Suchbegriff in Registry
-	if ($INST_architecture$ = "64")
-		Sub_search_registry64_uninstall_keys
-	else
-		Sub_search_registry32_uninstall_keys
-	endif
-	; Rückgabewert: $ResultList$ gefundene Einträge
+   	Set $ExitCode$ = getLastExitCode
+	if stringToBool(isNsisExitcodeFatal($ExitCode$, "True", $ErrorString$))
+        isFatalError
+    endif   	
+
+	; Ergebnis ist StringList (mehrere Einträge möglich);
+	; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
+	; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
+	Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
 
 	Switch count ($ResultList$)
 		Case "0"
@@ -34,17 +31,19 @@ else
 			isFatalError
 		EndCase
 		Case "1"
-			comment "Successful Installation"
-			comment "Get 'DisplayIcon' from registry for path to exe"
-			Set $RegId$ = takeSTring(0, $ResultList$)
-			if ($INST_architecture$ = "64")
-				Set $InstallDirExe$ = GetRegistryStringValue64("[" + $RegPathUninstall$ + "\" + $RegId$ + "] DisplayIcon")
-			else
-				Set $InstallDirExe$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] DisplayIcon")
+			; check version
+			Set $InstalledVersion$ = GetRegistryValue($RegId$, "DisplayVersion", $RegBitScope$)
+			if not ($ProductVersion$ = $InstalledVersion$)
+				logError "Fatal: Versions (package <-> installed) does not match)"
+				isFatalError
 			endif
+			comment "Successful Installation"
+			
+			comment "Get 'DisplayIcon' from registry for path to exe"
+			Set $PathToExe$ = GetRegistryValue($RegId$, "DisplayIcon", $RegBitScope$)
 
-			Set $DesktopIcon$ = GetProductProperty("desktopicon", "true")
-			if $DesktopIcon$ = "false"
+			; Installer legt immer ein Desktop-Link an, daher umgedrehte Logik
+			if $DesktopLink$ = "false"
 				Linkfolder_delete_desktopicon
 			endif  
 

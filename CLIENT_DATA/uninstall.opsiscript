@@ -2,8 +2,6 @@
 ; common Values for (un)installation
 include_insert "common.opsiinc"
 
-killtask "vlc.exe"
-
 if FileExists("%ScriptPath%\delsub.opsiscript")
 	comment  "Start uninstall sub section"
 	sub "%ScriptPath%\delsub.opsiscript"

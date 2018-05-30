@@ -1,16 +1,11 @@
-Message "Deinstalling " + $ProductName$ + " " + $INST_architecture$ + " Bit ..."
+Message "Deinstalling " + $ProductName$ + " ..."
 
-;Set $UninstallProgram32$ = "%ProgramFiles32Dir%\VideoLAN\VLC\uninstall.exe"
-;Set $UninstallProgram64$ = "%ProgramFiles64Dir%\VideoLAN\VLC\uninstall.exe"
+killtask "vlc.exe"
 
-Set $SearchPattern$ = $ProductName$
-; Parameter: $SearchPattern$ Suchbegriff in Registry
-if ($INST_architecture$ = "64")
-	Sub_search_registry64_uninstall_keys
-else
-	Sub_search_registry32_uninstall_keys
-endif
-; Rückgabewert: $ResultList$ gefundene Einträge
+; Ergebnis ist StringList (mehrere Einträge möglich);
+; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
+; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
+Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
 
 Switch count ($ResultList$)
 	Case "0"
@@ -18,13 +13,12 @@ Switch count ($ResultList$)
 	EndCase
 	Case "1"
 		set $firstInstallation$ = "false"
-		
-		Set $RegId$ = takeSTring(0, $ResultList$)
-		if ($INST_architecture$ = "64")
-			Set $UninstallProgram$ = GetRegistryStringValue64("[" + $RegPathUninstall$ + "\" + $RegId$ + "] UninstallString")
-		else
-			Set $UninstallProgram$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] UninstallString")
-		endif
+
+		Set $RegId$ = takeString (0,splitString(takeString(0,$ResultList$), '|'))
+		Set $RegBitScope$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
+		Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
+		; entferne Anführungszeichen aus RegKey UninstallString, falls vorhanden
+		Set $UninstallProgram$ = stringReplace($UninstallProgram$, '"', '')
 	EndCase
 	DefaultCase
 		logError "Found more than one installation! This case is not intended yet in this script! Stop now."
@@ -33,15 +27,12 @@ Switch count ($ResultList$)
 EndSwitch
 
 if not ( $UninstallProgram$ = "" )
-    	Winbatch_uninstall
-    	sub_check_exitcode
-    
-	set $DesktopIcon$ = getProductProperty("desktopicon","no")
-	if $DesktopIcon$ = "yes"
-		comment "Delete common desktop icon"
-		Linkfolder_uninstall_desktopicon	
-	endif
-
+   	Winbatch_uninstall
+   	Set $ExitCode$ = getLastExitCode
+	if stringToBool(isNsisExitcodeFatal($ExitCode$, "True", $ErrorString$))
+        isFatalError
+    endif   	
+   	
 	comment "include custom post deinstall file"
 	set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
 	if not ($CustomPostDeinstall$ = "none")
