@@ -9,7 +9,7 @@ Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
 
 Switch count ($ResultList$)
 	Case "0"
-		comment "No installations of " + $SearchPattern$ + " found in $RegPathUninstall$. Nothing to do ;-)"
+		comment "No installations of " + $ProductName$ + " found in Registry. Nothing to do ;-)"
 	EndCase
 	Case "1"
 		set $firstInstallation$ = "false"

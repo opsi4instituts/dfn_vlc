@@ -15,10 +15,10 @@ else
 	
 	comment "Start setup program"
 	Winbatch_install
-   	Set $ExitCode$ = getLastExitCode
+	Set $ExitCode$ = getLastExitCode
 	if stringToBool(isNsisExitcodeFatal($ExitCode$, "True", $ErrorString$))
         isFatalError
-    endif   	
+    endif
 
 	; Ergebnis ist StringList (mehrere Einträge möglich);
 	; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
@@ -31,6 +31,9 @@ else
 			isFatalError
 		EndCase
 		Case "1"
+			Set $RegId$ = takeString (0,splitString(takeString(0,$ResultList$), '|'))
+			Set $RegBitScope$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
+
 			; check version
 			Set $InstalledVersion$ = GetRegistryValue($RegId$, "DisplayVersion", $RegBitScope$)
 			if not ($ProductVersion$ = $InstalledVersion$)

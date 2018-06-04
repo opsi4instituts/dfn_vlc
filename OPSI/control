@@ -1,5 +1,5 @@
 [Package]
-version: 1
+version: 2
 depends: 
 
 [Product]
@@ -63,6 +63,10 @@ description: Link on Desktop?
 default: False
 
 [Changelog]
+dfn_vlc (3.0.3-2) stable; urgency=low
+  * Fix für $RegBitScope$
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 26.04.2018
+
 dfn_vlc (3.0.3-1) stable; urgency=low
   * neue Upstreamversion
   * neue Regsuche (local function, universel 32/64, benötigt opsi-winst 4.12.0.16)
