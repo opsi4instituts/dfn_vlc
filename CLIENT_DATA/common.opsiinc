@@ -25,6 +25,7 @@ DefStringList $languagemap$
 DefVar $firstInstallation$
 DefVar $ProductVersion$
 DefVar $InstalledVersion$
+DefVar $ResultNumber$ 
 
 Set $INST_SystemType$   = GetSystemType
 Set $INST_architecture$ = GetProductProperty("install_architecture","system specific")

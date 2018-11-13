@@ -1,5 +1,5 @@
 [Package]
-version: 1
+version: 2
 depends: 
 incremental: False
 
@@ -9,6 +9,7 @@ id: dfn_vlc
 name: VLC media player
 description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming ||  Media player for video and audio, CD, DVD and streaming
 advice: 
+
 version: 3.0.4
 priority: 0
 licenseRequired: False
@@ -64,6 +65,12 @@ description: Link on Desktop?
 default: False
 
 [Changelog]
+dfn_vlc (3.0.4-2) stable; urgency=low
+
+General uninstaller added.
+
+ -- Eric Esser <eric.esser@wzb.eu>  Tue, 13 Nov 2018 13:11:44 +0000
+
 dfn_vlc (3.0.4-1) stable; urgency=low
 
   * neue Upstreamversion.

@@ -7,42 +7,41 @@ killtask "vlc.exe"
 ; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
 Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
 
-Switch count ($ResultList$)
-	Case "0"
-		comment "No installations of " + $ProductName$ + " found in Registry. Nothing to do ;-)"
-	EndCase
-	Case "1"
-		set $firstInstallation$ = "false"
+Set $ResultNumber$ = count ($ResultList$)
 
-		Set $RegId$ = takeString (0,splitString(takeString(0,$ResultList$), '|'))
-		Set $RegBitScope$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
-		Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
-		; entferne Anführungszeichen aus RegKey UninstallString, falls vorhanden
-		Set $UninstallProgram$ = stringReplace($UninstallProgram$, '"', '')
-	EndCase
-	DefaultCase
-		logError "Found more than one installation! This case is not intended yet in this script! Stop now."
-		isFatalError
-	EndCase
-EndSwitch
+if ($ResultNumber$ = "0")
+  comment "No installations of " + $SearchPattern$ + " found in $RegPathUninstall$. Nothing to do"
+else
+  for %SingleResult% in $ResultList$ do sub_uninstall
+endif    
 
-if not ( $UninstallProgram$ = "" )
-   	Winbatch_uninstall
-   	Set $ExitCode$ = getLastExitCode
-	if stringToBool(isNsisExitcodeFatal($ExitCode$, "True", $ErrorString$))
-        isFatalError
-    endif   	
-   	
-	comment "include custom post deinstall file"
-	set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
-	if not ($CustomPostDeinstall$ = "none")
-		if FileExists("%ScriptPath%\custom\" + $CustomPostDeinstall$)
-			include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
-		endif
+comment "include custom post deinstall file"
+set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
+if not ($CustomPostDeinstall$ = "none")
+	if FileExists("%ScriptPath%\custom\" + $CustomPostDeinstall$)
+		include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
 	endif
+endif
+
+[sub_uninstall]
+comment "Found installation in registry: %SingleResult%"
+Message "Uninstalling " + $ProductName$
+
+set $firstInstallation$ = "false"
+
+Set $RegId$ = takeString (0,splitString("%SingleResult%", '|'))
+Set $RegBitScope$ = takeString (1,splitString("%SingleResult%", '|'))
+Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
+; entferne Anführungszeichen aus RegKey UninstallString, falls vorhanden
+Set $UninstallProgram$ = stringReplace($UninstallProgram$, '"', '')
+
+if not ($UninstallProgram$ = "" )
+  Winbatch_uninstall
+  Set $ExitCode$ = getLastExitCode
+  if stringToBool(isNsisExitcodeFatal($ExitCode$, "True", $ErrorString$))
+    isFatalError
+  endif   	
 endif
 
 [Winbatch_uninstall]
 "$UninstallProgram$" /S
-
-
