@@ -1,14 +1,14 @@
 [Package]
-version: 3
+version: 1
 depends: 
 
 [Product]
 type: localboot
 id: dfn_vlc
 name: VLC media player
-description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming ||  Media player for video and audio, CD, DVD and streaming
+description: Medienabspieler für diverse Audio- und Videocodecs, Dateiformate sowie auch DVD, Video-CD und Streaming [Media player for video and audio, CD, DVD and streaming]
 advice: 
-version: 3.0.4
+version: 3.0.5
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -63,6 +63,11 @@ description: Link on Desktop?
 default: False
 
 [Changelog]
+dfn_vlc (3.0.5-1) stable; urgency=low
+  * neue Upstreamversion
+  * englische Beschreibung in []
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 02.01.2019
+
 dfn_vlc (3.0.4-3) stable; urgency=low
   * neues o4i-Logo
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 19.12.2018
